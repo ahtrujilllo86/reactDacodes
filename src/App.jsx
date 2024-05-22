@@ -1,13 +1,11 @@
-import './App.css'
-import Body from './components/Body.jsx'
-import NavBar from './components/NavBar'
+// import './App.css'
+import Calculadora from './components/Calculadora.jsx'
 
 function App() {
   return (
     <>
       <div>
-        <NavBar />
-        <Body />
+        <Calculadora />
       </div>
     </>
   )
