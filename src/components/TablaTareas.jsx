@@ -28,7 +28,6 @@ function TablaTareas(tareas) {
 
   const cerrarModal = () => {
     setOpen(false);
-    console.log(tareaFinalizar);
   };
 
   const style = {

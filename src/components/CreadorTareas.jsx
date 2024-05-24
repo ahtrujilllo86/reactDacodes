@@ -9,7 +9,6 @@ function CreadorTareas() {
   const guardarTarea = (e) => {
     e.preventDefault();
     setTareas([...tareas, inputvalue]);
-    console.log(tareas);
     setinputvalue("");
   };
 
