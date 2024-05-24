@@ -26,6 +26,7 @@ function Calculadora() {
   const [operacion, setOperacion] = useState("");
   const [operando1, setOperando1] = useState(0);
   const [operando2, setOperando2] = useState(0);
+  const [teclado, setTeclado] = useState("");
 
   const operadores = ["*", "/", "-", "+", "="];
   const digitosAceptados = [
@@ -46,8 +47,8 @@ function Calculadora() {
     "c",
     "C",
     "Enter",
-    "="
-  ]
+    "=",
+  ];
 
   const operacionCompleta = () => {
     setOperando1(0);
@@ -57,9 +58,10 @@ function Calculadora() {
 
   const borrado = () => {
     setDigito("");
-    setDisplay("0");
     setOperando1(0);
     setOperando2(0);
+    setDisplay("0");
+    resultado = '';
   };
 
   const realizarOperacion = (resultado, digit) => {
@@ -78,19 +80,158 @@ function Calculadora() {
   // useEffect(() => {
   //   document.addEventListener("keyup", botonPresionado, false);
   //   console.log(digito)
-  // }, [digito]);
+  // }, []);
+  let resultado = "";
+  let operador1 = 0;
+  let operador2 = 0;
+  let resultadoParcial = 0;
+  let tipoOperacion = "";
+
+  useEffect(() => {
+    document.addEventListener("keyup", (event) => {
+      concatenar(event.key);
+      console.log("event key", event.key);
+    });
+  }, []);
+
+  const concatenar = (e) => {
+    if (e === "Enter") {
+      e = "=";
+    }
+    if (e === "c" || e === "C") {
+      borrado();
+      return false;
+    }
+    if (!digitosAceptados.includes(e)) {
+      console.log('no aceptado');
+      console.log(e);
+      return false;
+    }
+
+    resultado = resultado.concat(...e);
+    console.log("concatenar", resultado);
+    setDisplay(resultado);
+    if (operadores.includes(e)) {
+      // setDisplay('');
+      if (!detectarOperando(resultado)) {
+        resultado = "";
+        tipoOperacion = e;
+        return false;
+      }
+
+      if (tipoOperacion === "+") {
+        resultadoParcial = operador1 + operador2;
+        // realizarOperacion(resultado, tipoOperacion);
+        // return;
+      }
+
+      if (tipoOperacion === "-") {
+        resultadoParcial = operador1 - operador2;
+        // realizarOperacion(resultado, tipoOperacion);
+        // return;
+      }
+
+      if (tipoOperacion === "*") {
+        resultadoParcial = operador1 * operador2;
+        // realizarOperacion(resultado, tipoOperacion);
+        // return;
+      }
+
+      if (tipoOperacion === "/") {
+        resultadoParcial = operador1 / operador2;
+        // realizarOperacion(resultado, tipoOperacion);
+        // return;
+      }
+
+      setDisplay(resultadoParcial);
+      operador2 = 0;
+      resultado = resultadoParcial.toString();
+      if (e !== "=") {
+        setDisplay(resultado.concat(...e));
+        resultado = "";
+      }
+      // resultadoParcial = operador1;
+      // return false;
+
+      // return setDisplay(parseFloat(digito + digit));
+
+      // realizarOperacion(resultado, digit);
+
+      // resultado = "";
+      // return false;
+    }
+  };
+
+  const detectarOperando = (resultado) => {
+    console.log("resultado", parseFloat(resultado));
+    if (operador1 === 0) {
+      operador1 = parseFloat(resultado);
+      console.log("operando1 => ", operador1);
+      // setOperando1(operador1);
+      return false;
+    }
+    if (resultadoParcial !== 0) {
+      operador1 = parseFloat(resultadoParcial);
+      resultadoParcial = 0;
+      return false;
+    }
+    if (operador2 === 0) {
+      operador2 = parseFloat(resultado);
+      console.log("operando2 => ", operador2);
+      // setOperando2(operador2);
+    }
+    return true;
+  };
+
+  const armarCantidades = (e) => {
+    console.log("llave", display);
+    setDisplay(e);
+    // if (e.key === "Enter") {
+    //   e.key = "=";
+    // }
+    // if (operadores.includes(e.key)) {
+    //   // setTeclado('');
+    //   detectarOperando();
+    //   return false;
+    // }
+
+    // if (!digitosAceptados.includes(e.key)) {
+    //   console.log('no aceptado');
+    //   console.log(e.key);
+    //   return false;
+    // }
+
+    // if (e.key === ("c" || "C")) {
+    //   borrado();
+    //   return false;
+    // }
+    // let digit = teclado + e.key;
+
+    // // digit = teclado + digit;+
+    // console.log(digit);
+    // if (!operadores.includes(digit)) {
+    //   setDisplay(digit);
+    //   setTeclado(digit);
+    //   setDigito(digit);
+    //   setOperando2(parseFloat(digit));
+    //   // console.log(`Presionaste -> ${digit}`);
+    // }
+  };
 
   const botonPresionado = (e) => {
+    console.log("boton presionado");
+    console.log("op1, op2", operando1, operando2);
     let digit = e.target.value ?? e.key;
+    if (e.key === "Enter") {
+      digit = "=";
+    }
     if (!digitosAceptados.includes(digit)) {
       console.log('no aceptado');
       console.log(digit);
       return false;
     }
-    if (e.key === "Enter") {
-      digit = "=";
-    }
-    if (e.key === ("c" || "C")) {
+
+    if (digit === 'c' || digit === 'C') {
       borrado();
       return false;
     }
@@ -98,24 +239,18 @@ function Calculadora() {
       setDisplay(digito + digit);
       setDigito(digito + digit);
       setOperando2(parseFloat(digito + digit));
-      console.log(`Presionaste -> ${digit}`);
+      // console.log(`Presionaste -> ${digit}`);
     }
     if (operadores.includes(digit)) {
       setOperacion(digit);
-      if (digit !== '=') setDisplay(digito + digit);
-      // console.log(`metodo -> ${digit}`);
+      if (digit !== "=") setDisplay(digito + digit);
       if (!isNaN(parseFloat(digito + digit)))
         setOperando1(parseFloat(digito + digit));
-      // console.log(`ParseFloat -> ${parseFloat(digito + digit)}`);
-      // console.log(`Operando1 -> ${operando1}`);
-      // console.log(`Operando2 -> ${operando2}`);
       const tipoOperacion = operacion;
 
       if (digit === "=" || (operando1 && operando2) !== 0) {
-        setDigito("");
         if ((operando1 || operando2) === 0 || isNaN(parseFloat(digito + digit)))
           return;
-        // console.log(`Tipo Operacion -> ${tipoOperacion}`);
         if (tipoOperacion === "+") {
           const resultado = operando1 + operando2;
           realizarOperacion(resultado, digit);
@@ -162,24 +297,100 @@ function Calculadora() {
             value={display}
           />
           <br />
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"1"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"2"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"3"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"*"}/><br />
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"4"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"5"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"6"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"/"}/><br />
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"7"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"8"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"9"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"-"}/><br />
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"."}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"0"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"00"}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"+"}/><br />
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButtonTriple} numero= {"="}/>
-          <BotonCalculadora botonPresionado={botonPresionado} estilo={styleButton} numero= {"C"}/>
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"1"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"2"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"3"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"*"}
+          />
+          <br />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"4"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"5"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"6"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"/"}
+          />
+          <br />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"7"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"8"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"9"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"-"}
+          />
+          <br />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"."}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"0"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"00"}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"+"}
+          />
+          <br />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButtonTriple}
+            numero={"="}
+          />
+          <BotonCalculadora
+            botonPresionado={botonPresionado}
+            estilo={styleButton}
+            numero={"C"}
+          />
         </Grid>
       </Grid>
     </>
