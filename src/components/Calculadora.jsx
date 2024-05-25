@@ -48,7 +48,8 @@ function Calculadora() {
 		'c',
 		'C',
 		'Enter',
-		'=',
+    '=',
+    'Backspace',
 	];
 
 	const borrado = () => {
@@ -79,6 +80,11 @@ function Calculadora() {
 		if (e === 'c' || e === 'C') {
 			borrado();
 			return false;
+    }
+    if (e === 'Backspace') {
+      if (resultado === '' || typeof resultado !== 'string') return false;
+      resultado = resultado.slice(0, -1);
+			return setDisplay(resultado)
     }
     return true;
   };
